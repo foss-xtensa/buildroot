@@ -1,0 +1,46 @@
+From 84c0177aa586e4098480135e72716efabe646975 Mon Sep 17 00:00:00 2001
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Wed, 14 Feb 2018 16:12:54 -0800
+Subject: [PATCH] xtensa: support DMA_ATTR_NO_KERNEL_MAPPING attribute
+
+An application that doesn't need kernel mapping of the DMA memory it
+allocates may specify DMA_ATTR_NO_KERNEL_MAPPING attribute to allocation
+function. Support this attribute and return address of the first struct
+page that covers the allocation.
+
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ arch/xtensa/kernel/pci-dma.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/arch/xtensa/kernel/pci-dma.c b/arch/xtensa/kernel/pci-dma.c
+index ac74bd5ca4aa..49aa1426b6f3 100644
+--- a/arch/xtensa/kernel/pci-dma.c
++++ b/arch/xtensa/kernel/pci-dma.c
+@@ -145,6 +145,10 @@ static void *xtensa_dma_alloc(struct device *dev, size_t size,
+ 
+ 	*handle = phys_to_dma(dev, page_to_phys(page));
+ 
++	if (attrs & DMA_ATTR_NO_KERNEL_MAPPING) {
++		return page;
++	}
++
+ 	if (PageHighMem(page)) {
+ 		void *p;
+ 
+@@ -179,8 +183,10 @@ static void xtensa_dma_free(struct device *dev, size_t size, void *vaddr,
+ 	unsigned long addr = (unsigned long)vaddr;
+ 	struct page *page;
+ 
+-	if (addr >= XCHAL_KSEG_BYPASS_VADDR &&
+-	    addr - XCHAL_KSEG_BYPASS_VADDR < XCHAL_KSEG_SIZE) {
++	if (attrs & DMA_ATTR_NO_KERNEL_MAPPING) {
++		page = vaddr;
++	} else if (addr >= XCHAL_KSEG_BYPASS_VADDR &&
++		   addr - XCHAL_KSEG_BYPASS_VADDR < XCHAL_KSEG_SIZE) {
+ 		addr += XCHAL_KSEG_CACHED_VADDR - XCHAL_KSEG_BYPASS_VADDR;
+ 		page = virt_to_page(addr);
+ 	} else {
+-- 
+2.1.4
+
