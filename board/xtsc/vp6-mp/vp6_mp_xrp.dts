@@ -83,11 +83,10 @@
 		queue-priority = <7 5 6>;
 		firmware-name = "xrp0.elf";
 		ranges = <0x00000000 0x00000000 0x20000000
-			  0xcff80000 0x20000000 0x00040000
-			  0xcffc0000 0x20040000 0x00040000
-			  0xd0000000 0x20080000 0x00008000
-			  0xd0080000 0xd0080000 0x01000000
-			  0xe0000000 0xe0000000 0x20000000>;
+			  0x3ffc0000 0x20000000 0x00020000
+			  0x3ffe0000 0x20020000 0x00020000
+			  0x50000000 0x50000000 0x01000000
+			  0x60000000 0x60000000 0x20000000>;
 		dsp@0 {
 		};
 	};
@@ -106,58 +105,12 @@
 		queue-priority = <7 6 5>;
 		firmware-name = "xrp1.elf";
 		ranges = <0x00000000 0x00000000 0x20000000
-			  0xcff80000 0x200c0000 0x00040000
-			  0xcffc0000 0x20100000 0x00040000
-			  0xd0000000 0x20140000 0x00008000
-			  0xd0080000 0xd0080000 0x01000000
-			  0xe0000000 0xe0000000 0x20000000>;
+			  0x3ffc0000 0x20040000 0x00020000
+			  0x3ffe0000 0x20060000 0x00020000
+			  0x50000000 0x50000000 0x01000000
+			  0x60000000 0x60000000 0x20000000>;
 		dsp@0 {
 		};
 	};
 
-	xvp@2 {
-		#address-cells = <1>;
-		#size-cells = <1>;
-		compatible = "cdns,xrp-hw-simple,cma";
-		reg = <0x30003000 0x00000200>;
-		memory-region = <&xrp_reserved>;
-		device-irq = <0 1 5>; /* offset, bit#, IRQ# */
-		device-irq-mode = <1>;
-		host-irq = <0xffffd000 0>; /* offset, bit# */
-		host-irq-mode = <2>;
-		interrupts = <15 0>;
-		queue-priority = <7 6 5>;
-		firmware-name = "xrp2.elf";
-		ranges = <0x00000000 0x00000000 0x20000000
-			  0xcff80000 0x20180000 0x00040000
-			  0xcffc0000 0x201c0000 0x00040000
-			  0xd0000000 0x20200000 0x00008000
-			  0xd0080000 0xd0080000 0x01000000
-			  0xe0000000 0xe0000000 0x20000000>;
-		dsp@0 {
-		};
-	};
-
-	xvp@3 {
-		#address-cells = <1>;
-		#size-cells = <1>;
-		compatible = "cdns,xrp-hw-simple,cma";
-		reg = <0x30004000 0x00000200>;
-		memory-region = <&xrp_reserved>;
-		device-irq = <0 1 5>; /* offset, bit#, IRQ# */
-		device-irq-mode = <1>;
-		host-irq = <0xffffc000 0>; /* offset, bit# */
-		host-irq-mode = <2>;
-		interrupts = <15 0>;
-		queue-priority = <7 6 5>;
-		firmware-name = "xrp3.elf";
-		ranges = <0x00000000 0x00000000 0x20000000
-			  0xcff80000 0x20240000 0x00040000
-			  0xcffc0000 0x20280000 0x00040000
-			  0xd0000000 0x202c0000 0x00008000
-			  0xd0080000 0xd0080000 0x01000000
-			  0xe0000000 0xe0000000 0x20000000>;
-		dsp@0 {
-		};
-	};
 };

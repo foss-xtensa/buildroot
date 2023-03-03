@@ -12,7 +12,7 @@ XRP_FIRMWARE_LICENSE = MIT
 XRP_FIRMWARE_CONFIG-$(BR2_PACKAGE_XRP_FIRMWARE_XTENSA_NEED_SYSTEM) = \
 	XTENSA_SYSTEM=$(BR2_PACKAGE_XRP_FIRMWARE_XTENSA_SYSTEM)
 
-XRP_FIRMWARE_CONF_ENV = CC="xt-xcc --xtensa-core=$(BR2_PACKAGE_$(PKG)_DSP_CORE_NAME)" AR=xt-ar RANLIB=xt-ranlib
+XRP_FIRMWARE_CONF_ENV = CC="xt-clang --xtensa-core=$(call qstrip,$(BR2_PACKAGE_$(PKG)_DSP_CORE_NAME))" AR="xt-ar --xtensa-core=$(call qstrip,$(BR2_PACKAGE_$(PKG)_DSP_CORE_NAME))" RANLIB="xt-ranlib --xtensa-core=$(call qstrip,$(BR2_PACKAGE_$(PKG)_DSP_CORE_NAME))"
 HOST_XRP_FIRMWARE_CONF_ENV = $(XRP_FIRMWARE_CONF_ENV)
 
 XRP_FIRMWARE_CONF_OPTS = --disable-host --enable-dsp --enable-hosted --disable-standalone --disable-single
@@ -31,7 +31,8 @@ endif
 define XRP_FIRMWARE_CONFIGURE_CMDS
 	(cd $($(PKG)_SRCDIR) && rm -rf config.cache && \
 	$($(PKG)_CONF_ENV) \
-	PATH=$(BR2_PACKAGE_$(PKG)_XTENSA_TOOLS):$$PATH \
+	XTENSA_SYSTEM="$(call qstrip,$(BR2_PACKAGE_$(PKG)_XTENSA_TOOLS))/../config" \
+	PATH="$(call qstrip,$(BR2_PACKAGE_$(PKG)_XTENSA_TOOLS)):$$PATH" \
 	CONFIG_SITE=/dev/null \
 	./configure \
 		--host=xtensa-elf \
@@ -51,6 +52,7 @@ XRP_FIRMWARE_IMAGE_NAME = xrp-dsp-hosted
 HOST_XRP_FIRMWARE_IMAGE_NAME = xrp-dsp-standalone
 
 define XRP_FIRMWARE_BUILD_CMDS
+  XTENSA_SYSTEM="$(call qstrip,$(BR2_PACKAGE_$(PKG)_XTENSA_TOOLS))/../config" \
   $(BR2_PACKAGE_$(PKG)_XTENSA_TOOLS)/../libexec/xt-mbuild \
 	-root $(@D) -socfile $(BR2_PACKAGE_XRP_FIRMWARE_DSP_LSP_XTSYS) \
 	-syspkg $(@D)/xrp-example/soc/package \
@@ -60,7 +62,8 @@ define XRP_FIRMWARE_BUILD_CMDS
   for (( CORE=0; CORE < $(BR2_PACKAGE_$(PKG)_DSP_NUM_CORES); ++CORE )) ; do \
     $(MAKE) \
 	$($(PKG)_CONFIG-y) \
-	PATH=$(BR2_PACKAGE_$(PKG)_XTENSA_TOOLS):$$PATH \
+	XTENSA_SYSTEM="$(call qstrip,$(BR2_PACKAGE_$(PKG)_XTENSA_TOOLS))/../config" \
+	PATH="$(call qstrip,$(BR2_PACKAGE_$(PKG)_XTENSA_TOOLS)):$$PATH" \
 	-C $(@D) \
 	DSP_LSP=`printf $(BR2_PACKAGE_$(PKG)_DSP_LSP) $${CORE}` \
 	DSP_COMM_BASE=$${DSP_COMM_BASES[$${CORE}]} && \
