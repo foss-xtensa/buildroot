@@ -7,34 +7,6 @@ config BR2_PACKAGE_XRP
 	help
 	  XRP is the low level Xtensa Remote Processing
 
-config BR2_PACKAGE_XRP_USERSPACE
-	bool "Build XRP userspace code"
-	depends on BR2_PACKAGE_XRP
-	default y
-	help
-	  XRP package contains kernel driver, host userspace library and
-	  example code and firmware library and example code.
-	  Say 'Y' here to build host userspace code.
-
-if BR2_PACKAGE_XRP_USERSPACE
-
-config BR2_PACKAGE_XRP_KERNEL_TESTS
-	bool "Build XRP kernel driver tests"
-	help
-	  XRP package contains kernel driver, host userspace library and
-	  example code and firmware library and example code.
-	  Say 'Y' here to build tests for the kernel driver.
-
-config BR2_PACKAGE_XRP_EXAMPLE
-	bool "Build XRP example"
-	default y
-	help
-	  XRP package contains kernel driver, host userspace library and
-	  example code and firmware library and example code.
-	  Say 'Y' here to build example code for host userspace.
-
-endif
-
 config BR2_PACKAGE_XRP_FIRMWARE
 	bool "XRP firmware"
 	help

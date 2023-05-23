@@ -9,23 +9,14 @@ XRP_FIRMWARE_SITE = $(XRP_SITE)
 XRP_FIRMWARE_SOURCE = $(XRP_SOURCE)
 XRP_FIRMWARE_LICENSE = MIT
 
-XRP_FIRMWARE_CONFIG-$(BR2_PACKAGE_XRP_FIRMWARE_XTENSA_NEED_SYSTEM) = \
-	XTENSA_SYSTEM=$(BR2_PACKAGE_XRP_FIRMWARE_XTENSA_SYSTEM)
-
 XRP_FIRMWARE_CONF_ENV = CC="xt-clang --xtensa-core=$(call qstrip,$(BR2_PACKAGE_$(PKG)_DSP_CORE_NAME))" AR="xt-ar --xtensa-core=$(call qstrip,$(BR2_PACKAGE_$(PKG)_DSP_CORE_NAME))" RANLIB="xt-ranlib --xtensa-core=$(call qstrip,$(BR2_PACKAGE_$(PKG)_DSP_CORE_NAME))"
-HOST_XRP_FIRMWARE_CONF_ENV = $(XRP_FIRMWARE_CONF_ENV)
 
 XRP_FIRMWARE_CONF_OPTS = --disable-host --enable-dsp --enable-hosted --disable-standalone --disable-single
-HOST_XRP_FIRMWARE_CONF_OPTS = --disable-host --enable-dsp --disable-hosted --enable-standalone --disable-single
 
 ifeq ($(BR2_PACKAGE_XRP_FIRMWARE_EXAMPLE),y)
 XRP_FIRMWARE_CONF_OPTS += --enable-example
 XRP_FIRMWARE_CONF_OPTS += --enable-port=simple-xos
 #XRP_FIRMWARE_CONF_OPTS += CFLAGS=-DDEBUG
-endif
-
-ifeq ($(BR2_PACKAGE_HOST_XRP_FIRMWARE_EXAMPLE),y)
-HOST_XRP_FIRMWARE_CONF_OPTS += --enable-example
 endif
 
 define XRP_FIRMWARE_CONFIGURE_CMDS
@@ -46,10 +37,7 @@ define XRP_FIRMWARE_CONFIGURE_CMDS
 	)
 endef
 
-HOST_XRP_FIRMWARE_CONFIGURE_CMDS = $(XRP_FIRMWARE_CONFIGURE_CMDS)
-
 XRP_FIRMWARE_IMAGE_NAME = xrp-dsp-hosted
-HOST_XRP_FIRMWARE_IMAGE_NAME = xrp-dsp-standalone
 
 define XRP_FIRMWARE_BUILD_CMDS
   XTENSA_SYSTEM="$(call qstrip,$(BR2_PACKAGE_$(PKG)_XTENSA_TOOLS))/../config" \
@@ -71,19 +59,10 @@ define XRP_FIRMWARE_BUILD_CMDS
   done
 endef
 
-HOST_XRP_FIRMWARE_BUILD_CMDS = $(XRP_FIRMWARE_BUILD_CMDS)
-
 define XRP_FIRMWARE_INSTALL_TARGET_CMDS
   for (( CORE=0 ; CORE < $(BR2_PACKAGE_$(PKG)_DSP_NUM_CORES); ++CORE )) ; do \
     $(INSTALL) -D -m 0644 $(@D)/xrp-example/$($(PKG)_IMAGE_NAME)$${CORE} $(TARGET_DIR)/lib/firmware/xrp$${CORE}.elf ; \
   done
 endef
 
-define HOST_XRP_FIRMWARE_INSTALL_CMDS
-  for (( CORE=0 ; CORE < $(BR2_PACKAGE_$(PKG)_DSP_NUM_CORES); ++CORE )) ; do \
-    $(INSTALL) -D -m 0644 $(@D)/xrp-example/$($(PKG)_IMAGE_NAME)$${CORE} $(HOST_DIR)/lib/firmware/xrp$${CORE}.elf ; \
-  done
-endef
-
 $(eval $(generic-package))
-$(eval $(host-generic-package))
