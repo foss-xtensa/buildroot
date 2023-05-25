@@ -40,16 +40,6 @@ config BR2_PACKAGE_XRP_FIRMWARE_DSP_CORE_NAME
 	help
 	  Xtensa core name used to build firmware.
 
-config BR2_PACKAGE_XRP_FIRMWARE_EXAMPLE
-	bool "Build XRP firmware example"
-	default y
-	help
-	  XRP package contains kernel driver, host userspace library and
-	  example code and firmware library and example code.
-	  Say 'Y' here to build example firmware.
-
-if BR2_PACKAGE_XRP_FIRMWARE_EXAMPLE
-
 config BR2_PACKAGE_XRP_FIRMWARE_DSP_NUM_CORES
 	int "Number of DSP cores"
 	default 2
@@ -70,5 +60,4 @@ config BR2_PACKAGE_XRP_FIRMWARE_DSP_LSP
 	  Printf format string for LSP name for each core. May use %d or
 	  similar format placeholder.
 
-endif
 endif
