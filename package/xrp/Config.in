@@ -7,34 +7,6 @@ config BR2_PACKAGE_XRP
 	help
 	  XRP is the low level Xtensa Remote Processing
 
-config BR2_PACKAGE_XRP_USERSPACE
-	bool "Build XRP userspace code"
-	depends on BR2_PACKAGE_XRP
-	default y
-	help
-	  XRP package contains kernel driver, host userspace library and
-	  example code and firmware library and example code.
-	  Say 'Y' here to build host userspace code.
-
-if BR2_PACKAGE_XRP_USERSPACE
-
-config BR2_PACKAGE_XRP_KERNEL_TESTS
-	bool "Build XRP kernel driver tests"
-	help
-	  XRP package contains kernel driver, host userspace library and
-	  example code and firmware library and example code.
-	  Say 'Y' here to build tests for the kernel driver.
-
-config BR2_PACKAGE_XRP_EXAMPLE
-	bool "Build XRP example"
-	default y
-	help
-	  XRP package contains kernel driver, host userspace library and
-	  example code and firmware library and example code.
-	  Say 'Y' here to build example code for host userspace.
-
-endif
-
 config BR2_PACKAGE_XRP_FIRMWARE
 	bool "XRP firmware"
 	help
@@ -68,16 +40,6 @@ config BR2_PACKAGE_XRP_FIRMWARE_DSP_CORE_NAME
 	help
 	  Xtensa core name used to build firmware.
 
-config BR2_PACKAGE_XRP_FIRMWARE_EXAMPLE
-	bool "Build XRP firmware example"
-	default y
-	help
-	  XRP package contains kernel driver, host userspace library and
-	  example code and firmware library and example code.
-	  Say 'Y' here to build example firmware.
-
-if BR2_PACKAGE_XRP_FIRMWARE_EXAMPLE
-
 config BR2_PACKAGE_XRP_FIRMWARE_DSP_NUM_CORES
 	int "Number of DSP cores"
 	default 2
@@ -98,5 +60,4 @@ config BR2_PACKAGE_XRP_FIRMWARE_DSP_LSP
 	  Printf format string for LSP name for each core. May use %d or
 	  similar format placeholder.
 
-endif
 endif
