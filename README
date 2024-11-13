@@ -5,12 +5,13 @@ To build:
 
 	git clone https://github.com/foss-xtensa/buildroot.git
 	git -C buildroot checkout xtensa-xrp
+
+Edit `buildroot/configs/xtsc_vp6_mp_xrp_defconfig` to update
+`BR2_PACKAGE_XRP_FIRMWARE_XTENSA_TOOLS` and `BR2_PACKAGE_XRP_FIRMWARE_XTENSA_SYSTEM`:
+
 	mkdir buildroot-build
 	make -C buildroot/ O=../buildroot-build/ xtsc_vp6_mp_xrp_defconfig
 	cd buildroot-build
-
-Edit `xtsc_vp6_mp_xrp_defconfig` to set `BR2_PACKAGE_XRP_FIRMWARE_XTENSA_TOOLS` to Xtensa binary tools;
-ie: `/home/userx/xtensa/XtDevTools/install/tools/RI-2022.10-linux/XtensaTools/bin`
 
 	make
 
@@ -20,7 +21,7 @@ To run what was generated, we will use `xtsc-run`.
 
 A few environment variables should be set:
 
-	export XTENSA_SYSTEM="${BR2_PACKAGE_XRP_FIRMWARE_XTENSA_TOOLS}/../config"
+	export XTENSA_SYSTEM="${BR2_PACKAGE_XRP_FIRMWARE_XTENSA_SYSTEM}"
 	export XTENSA_CORE="visionp6_ao"
 	export XTENSA_TOOLS="${XTENSA_SYSTEM}/.."
 	export PATH="${XTENSA_TOOLS}/bin:${PATH}"
