@@ -1,0 +1,35 @@
+From 706fa431358390713c47667f6bcaecce56d071cc Mon Sep 17 00:00:00 2001
+From: William Tambe <williamt@cadence.com>
+Date: Thu, 11 Dec 2025 12:38:19 -0800
+Subject: [PATCH] mm/highmem: fix __kmap_to_page() build error
+
+Probably a miss from:
+ef6e06b2ef87 highmem: fix kmap_to_page() for kmap_local_page() addresses
+
+Signed-off-by: William Tambe <williamt@cadence.com>
+---
+ mm/highmem.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/mm/highmem.c b/mm/highmem.c
+index b5c8e4c2d5d4..a33e41183951 100644
+--- a/mm/highmem.c
++++ b/mm/highmem.c
+@@ -180,12 +180,13 @@ struct page *__kmap_to_page(void *vaddr)
+ 		for (i = 0; i < kctrl->idx; i++) {
+ 			unsigned long base_addr;
+ 			int idx;
++			pte_t pteval = kctrl->pteval[i];
+ 
+ 			idx = arch_kmap_local_map_idx(i, pte_pfn(pteval));
+ 			base_addr = __fix_to_virt(FIX_KMAP_BEGIN + idx);
+ 
+ 			if (base_addr == base)
+-				return pte_page(kctrl->pteval[i]);
++				return pte_page(pteval);
+ 		}
+ 	}
+ 
+-- 
+2.43.0
+

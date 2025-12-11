@@ -2320,6 +2320,7 @@ endif
 	source "package/uvw/Config.in"
 	source "package/volk/Config.in"
 	source "package/xapian/Config.in"
+	source "package/xrp/Config.in"
 	source "package/xnnpack/Config.in"
 endmenu
 

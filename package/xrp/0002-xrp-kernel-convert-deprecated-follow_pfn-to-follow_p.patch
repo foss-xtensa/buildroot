@@ -1,0 +1,61 @@
+From 84157eb78000e2c3e16c255bbea59fdda39c6f0f Mon Sep 17 00:00:00 2001
+From: William Tambe <williamt@cadence.com>
+Date: Thu, 11 Dec 2025 18:47:41 -0800
+Subject: [PATCH 2/3] xrp-kernel: convert deprecated follow_pfn() to
+ follow_pte()
+
+Used following commit as guide:
+1b265da7ea1e virt: acrn: stop using follow_pfn
+
+Signed-off-by: William Tambe <williamt@cadence.com>
+---
+ xrp-kernel/xvp_main.c | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/xrp-kernel/xvp_main.c b/xrp-kernel/xvp_main.c
+index 31646fc..667c353 100644
+--- a/xrp-kernel/xvp_main.c
++++ b/xrp-kernel/xvp_main.c
+@@ -839,10 +839,17 @@ static long xvp_pfn_virt_to_phys(struct xvp_file *xvp_file,
+ 	unsigned long nr_pages = PFN_UP(vaddr + size) - PFN_DOWN(vaddr);
+ 	unsigned long pfn;
+ 	const struct xrp_address_map_entry *address_map;
++	spinlock_t *ptl;
++	pte_t *ptep;
+ 
+-	ret = follow_pfn(vma, vaddr, &pfn);
+-	if (ret)
++	ret = follow_pte(vma, vaddr, &ptep, &ptl);
++	if (ret) {
++		pr_debug("%s: failed to lookup PFN at VMA:%pK\n",
++			__func__, (void *)vaddr);
+ 		return ret;
++	}
++	pfn = pte_pfn(ptep_get(ptep));
++	pte_unmap_unlock(ptep, ptl);
+ 
+ 	*paddr = __pfn_to_phys(pfn) + (vaddr & ~PAGE_MASK);
+ 	address_map = xrp_get_address_mapping(&xvp_file->xvp->address_map,
+@@ -855,10 +862,17 @@ static long xvp_pfn_virt_to_phys(struct xvp_file *xvp_file,
+ 	for (i = 1; i < nr_pages; ++i) {
+ 		unsigned long next_pfn;
+ 		phys_addr_t next_phys;
++		spinlock_t *ptl;
++		pte_t *ptep;
+ 
+-		ret = follow_pfn(vma, vaddr + (i << PAGE_SHIFT), &next_pfn);
+-		if (ret)
++		ret = follow_pte(vma, vaddr + (i << PAGE_SHIFT), &ptep, &ptl);
++		if (ret) {
++			pr_debug("%s: failed to lookup PFN at VMA:%pK\n", __func__,
++				(void *)vaddr + (i << PAGE_SHIFT));
+ 			return ret;
++		}
++		next_pfn = pte_pfn(ptep_get(ptep));
++		pte_unmap_unlock(ptep, ptl);
+ 		if (next_pfn != pfn + 1) {
+ 			pr_debug("%s: non-contiguous physical memory\n",
+ 				 __func__);
+-- 
+2.43.0
+

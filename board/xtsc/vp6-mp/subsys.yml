@@ -1,0 +1,127 @@
+---
+SubSystemName: SubSystem
+
+Metadata:
+  Version: 2
+
+Processors:
+  - Name              : DSP_0
+    Config            : visionp6_ao
+    ProcId            : 0
+    Master            : true
+    StaticVectorSel   : 0
+    DataRamFetchWidth : 64b
+    PifWidth          : 16b
+    IDMA              : {Shared: false}
+    DataRam0:
+      {LocalAddr: 0x3ffe0000, GlobalAddr: 0x20020000, Size: 128Kb, NumBanks: 2,
+       NumSubBanks: 8}
+    DataRam1:
+      {LocalAddr: 0x3ffc0000, GlobalAddr: 0x20000000, Size: 128Kb, NumBanks: 2,
+       NumSubBanks: 8}
+    LocalMMIO:
+      GlobalAddr : 0x30001000
+      Size       : 512b
+      InterruptRegister:
+        GlobalAddr : 0x30001000
+        InterruptMap:
+          - {BitOffset: 0, BInterrupt: 4,  ProcInterrupt: 4,  Type: Level}
+          - {BitOffset: 1, BInterrupt: 5,  ProcInterrupt: 5,  Type: Level}
+          - {BitOffset: 2, BInterrupt: 12, ProcInterrupt: 16, Type: Edge}
+      Controls:
+        - {GlobalAddr: 0x30001004, ControlMap: [{Name: BReset}]}
+        - {GlobalAddr: 0x30001008, ControlMap: [{Name: RunStall}], InitValue: 1}
+        - {GlobalAddr: 0x3000100c, ControlMap: [{Name: StatVectorSel}]}
+
+  - Name              : DSP_1
+    Config            : visionp6_ao
+    ProcId            : 1
+    StaticVectorSel   : 0
+    DataRamFetchWidth : 64b
+    PifWidth          : 16b
+    IDMA              : {Shared: false}
+    DataRam0:
+      {LocalAddr: 0x3ffe0000, GlobalAddr: 0x20060000, Size: 128Kb, NumBanks: 2,
+       NumSubBanks: 8}
+    DataRam1:
+      {LocalAddr: 0x3ffc0000, GlobalAddr: 0x20040000, Size: 128Kb, NumBanks: 2,
+       NumSubBanks: 8}
+    LocalMMIO:
+      GlobalAddr : 0x30002000
+      Size       : 512b
+      InterruptRegister:
+        GlobalAddr : 0x30002000
+        InterruptMap:
+          - {BitOffset: 0, BInterrupt: 4,  ProcInterrupt: 4,  Type: Level}
+          - {BitOffset: 1, BInterrupt: 5,  ProcInterrupt: 5,  Type: Level}
+          - {BitOffset: 2, BInterrupt: 12, ProcInterrupt: 16, Type: Edge}
+      Controls:
+        - {GlobalAddr: 0x30002004, ControlMap: [{Name: BReset}]}
+        - {GlobalAddr: 0x30002008, ControlMap: [{Name: RunStall}], InitValue: 1}
+        - {GlobalAddr: 0x3000200c, ControlMap: [{Name: StatVectorSel}]}
+
+  - Name              : Host
+    Config            : D_233L_pif128_LC
+    ProcId            : 2
+    Host              : true
+    StaticVectorSel   : 0
+    PifWidth          : 16b
+    Dcache:
+      LineSize: 32
+    LocalMMIO:
+      GlobalAddr : 0x30000000
+      Size       : 512b
+      InterruptRegister:
+        GlobalAddr : 0x30000000
+        InterruptMap:
+          - {BitOffset: 0, BInterrupt: 10,  ProcInterrupt: 15, Type: Edge}
+          - {BitOffset: 1, BInterrupt: 11,  ProcInterrupt: 16, Type: Edge}
+          - {BitOffset: 2, BInterrupt: 12,  ProcInterrupt: 17, Type: Edge}
+      Controls:
+        - {GlobalAddr: 0x30000004, ControlMap: [{Name: BReset}]}
+        - {GlobalAddr: 0x30000008, ControlMap: [{Name: RunStall}]}
+        - {GlobalAddr: 0x3000000c, ControlMap: [{Name: StatVectorSel}]}
+        - {GlobalAddr: 0x30000010, ControlMap: [{Name: BInterrupt13}]}
+        - {GlobalAddr: 0x30000014, ControlMap: [{Name: BInterrupt14}]}
+
+SystemRAM:
+  Size             : 512Mb
+  GlobalAddr       : 0x60000000
+  ReadDelay        : 1
+  ReadRepeat       : 1
+  WriteDelay       : 1
+  WriteRepeat      : 1
+  RequestFIFODepth : 255
+
+SystemROM:
+  {Size: 16Mb, GlobalAddr: 0x50000000}
+
+DeviceMemories:
+  - {Name: SystemRAM_L, 
+     Size: 128Mb, 
+     GlobalAddr: 0x00000000,
+     ReadDelay: 1,
+     ReadRepeat: 1,
+     WriteDelay: 1,
+     WriteRepeat: 1,
+     RequestFIFODepth : 255}
+  - {Name: SystemROM_L, 
+     Size: 16Mb, 
+     GlobalAddr: 0xfe000000,
+     ReadDelay: 1,
+     ReadRepeat: 1,
+     WriteDelay: 1,
+     WriteRepeat: 1,
+     RequestFIFODepth : 255}
+  - {Name: SharedRAM_L, 
+     Size: 384Mb, 
+     GlobalAddr: 0x08000000,
+     ReadDelay: 1,
+     ReadRepeat: 1,
+     WriteDelay: 1,
+     WriteRepeat: 1,
+     RequestFIFODepth : 255}
+
+SubSystemInterconnect:
+  - {Src: CommonBus,   Dests: [DSP_0, DSP_1]}
+
