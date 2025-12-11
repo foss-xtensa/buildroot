@@ -1,0 +1,10 @@
+Run $BUILD_DIR/host/usr/bin/xrp-linux-sim
+
+then run xtsc as follows:
+
+$XTENSA_TOOLS/XtensaTools/bin/xtsc-run \
+		--xtensa-system=$XTENSA_TOOLS/XtensaTools/config \
+		--set_xtsc_parm=turbo=true \
+		--define=P6_0_BINARY=$BUILD_DIR/host/lib/firmware/xrp0.elf \
+		--define=P6_1_BINARY=$BUILD_DIR/host/lib/firmware/xrp1.elf \
+		--include=./xtsc-run/SubSystem.inc

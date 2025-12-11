@@ -1,26 +1,53 @@
-Buildroot is a simple, efficient and easy-to-use tool to generate embedded
-Linux systems through cross-compilation.
+Buildroot config to generate XRP hosted implementation where CPU cores
+run host OS code and Xtensa DSP cores are connected to shared memory.
 
-The documentation can be found in docs/manual. You can generate a text
-document with 'make manual-text' and read output/docs/manual/manual.text.
-Online documentation can be found at http://buildroot.org/docs.html
+To build:
 
-To build and use the buildroot stuff, do the following:
+	git clone https://github.com/foss-xtensa/buildroot.git
+	git -C buildroot checkout xtensa-xrp
 
-1) run 'make menuconfig'
-2) select the target architecture and the packages you wish to compile
-3) run 'make'
-4) wait while it compiles
-5) find the kernel, bootloader, root filesystem, etc. in output/images
+Edit `buildroot/configs/xtsc_vp6_mp_xrp_defconfig` to update
+`BR2_PACKAGE_XRP_FIRMWARE_XTENSA_TOOLS` and `BR2_PACKAGE_XRP_FIRMWARE_XTENSA_SYSTEM`:
 
-You do not need to be root to build or run buildroot.  Have fun!
+	mkdir buildroot-build
+	make -C buildroot/ O=../buildroot-build/ xtsc_vp6_mp_xrp_defconfig
+	cd buildroot-build
 
-Buildroot comes with a basic configuration for a number of boards. Run
-'make list-defconfigs' to view the list of provided configurations.
+	make
 
-Please feed suggestions, bug reports, insults, and bribes back to the
-buildroot mailing list: buildroot@buildroot.org
-You can also find us on #buildroot on OFTC IRC.
+Find the kernel, root filesystem, etc ... in images/
 
-If you would like to contribute patches, please read
-https://buildroot.org/manual.html#submitting-patches
+To run what was generated, we will use `xtsc-run`.
+
+A few environment variables should be set:
+
+	export XTENSA_SYSTEM="${BR2_PACKAGE_XRP_FIRMWARE_XTENSA_SYSTEM}"
+	export XTENSA_CORE="visionp6_ao"
+	export XTENSA_TOOLS="${XTENSA_SYSTEM}/.."
+	export PATH="${XTENSA_TOOLS}/bin:${PATH}"
+
+We create the files needed by `xtsc-run`:
+
+	mkdir ../subsystem_visionp6_ao
+	cd ../subsystem_visionp6_ao
+	cp ../buildroot/board/xtsc/vp6-mp/subsys.yml .
+	${XTENSA_TOOLS}/libexec/xt-sysbuilder -subsys subsys.yml -swtools ${XTENSA_TOOLS} -build sysbuild
+	ln -snf ../buildroot-build/images/rootfs.ext2 rootfs.ext2
+
+We can now use `xtsc-run` to boot Linux:
+
+	xtsc-run \
+	--set_xtsc_parm=turbo=true \
+	--define=Host_BINARY=../buildroot-build/images/Image.elf \
+	--define=Host_BINARY_ARGS= \
+	--define=DSP_0_BINARY= \
+	--define=DSP_1_BINARY= \
+	--include=sysbuild/xtsc-run/SubSystem.inc \
+	--set_xtsc_parm="lua_script_files=sysbuild/xtsc-run/sim_cntrl.lua"
+
+At the login prompt, enter `root`.
+
+To run XRP hosted implementation, load the kernel module and start the userspace executable as follow:
+
+	modprobe xrp_hw_simple
+	xrp-host-hosted

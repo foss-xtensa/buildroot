@@ -1,0 +1,4 @@
+This is a DC233-based host + 4 x visionp6_ao DSP subsystem.
+
+DC233 core may be rebuilt from the D_233L_pif128_LC.xcf file.
+VP6 should be available for download from the XPG.

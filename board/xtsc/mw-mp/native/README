@@ -1,0 +1,9 @@
+Link or copy Image.elf and rootfs.ext2 to this directory and run xtsc as follows:
+
+$XTENSA_TOOLS/XtensaTools/bin/xtsc-run \
+		--xtensa-system=$XTENSA_TOOLS/XtensaTools/config \
+		--set_xtsc_parm=turbo=true \
+		--define=Host_BINARY=Image.elf \
+		--define=P6_0_BINARY= \
+		--define=P6_1_BINARY= \
+		--include=./xtsc-run/xtsc.inc
