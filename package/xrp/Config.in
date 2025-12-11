@@ -16,30 +16,6 @@ config BR2_PACKAGE_XRP_FIRMWARE
 
 if BR2_PACKAGE_XRP_FIRMWARE
 
-config BR2_PACKAGE_XRP_FIRMWARE_XTENSA_TOOLS
-	string "Xtensa tools location"
-	help
-	  Xtensa tools location
-
-config BR2_PACKAGE_XRP_FIRMWARE_XTENSA_NEED_SYSTEM
-	bool "Separate Xtensa core registry location"
-	default n
-	help
-	  Whether tools know where their core registry is or not (and so
-	  need --xtensa-system= parameter).
-
-config BR2_PACKAGE_XRP_FIRMWARE_XTENSA_SYSTEM
-	string "Xtensa core registry location"
-	depends on BR2_PACKAGE_XRP_FIRMWARE_XTENSA_NEED_SYSTEM
-	help
-	  Xtensa core registry location
-
-config BR2_PACKAGE_XRP_FIRMWARE_DSP_CORE_NAME
-	string "DSP core name"
-	default visionp6cnn_ao_exls
-	help
-	  Xtensa core name used to build firmware.
-
 config BR2_PACKAGE_XRP_FIRMWARE_DSP_NUM_CORES
 	int "Number of DSP cores"
 	default 2
