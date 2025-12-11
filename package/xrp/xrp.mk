@@ -10,8 +10,6 @@ XRP_SOURCE = xrp-$(XRP_VERSION).tar.gz
 XRP_LICENSE = MIT, GPL
 
 define XRP_BUILD_CMDS
-  XTENSA_SYSTEM="$(call qstrip,$(BR2_PACKAGE_XRP_FIRMWARE_XTENSA_SYSTEM))" \
-  XTENSA_CORE="$(call qstrip,$(BR2_PACKAGE_XRP_FIRMWARE_DSP_CORE_NAME))" \
   $(MAKE) -j1 $(TARGET_CONFIGURE_OPTS) -C $(@D)/xrp-example xrphosted
 endef
 

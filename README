@@ -1,37 +1,31 @@
 Buildroot config to generate XRP hosted implementation where CPU cores
 run host OS code and Xtensa DSP cores are connected to shared memory.
 
+A few environment variables should be set:
+
+	export XTENSA_SYSTEM="/path/to/XtensaTools/config"
+	export XTENSA_CORE="visionp6_ao"
+	export PATH="${XTENSA_SYSTEM}/../bin:${PATH}"
+
 To build:
 
 	git clone https://github.com/foss-xtensa/buildroot.git
 	git -C buildroot checkout xtensa-xrp
 
-Edit `buildroot/configs/xtsc_vp6_mp_xrp_defconfig` to update
-`BR2_PACKAGE_XRP_FIRMWARE_XTENSA_TOOLS` and `BR2_PACKAGE_XRP_FIRMWARE_XTENSA_SYSTEM`:
-
 	mkdir buildroot-build
 	make -C buildroot/ O=../buildroot-build/ xtsc_vp6_mp_xrp_defconfig
-	cd buildroot-build
+	make -C buildroot-build/
 
-	make
+Find the kernel, root filesystem, etc ... under buildroot-build/images/
 
-Find the kernel, root filesystem, etc ... in images/
-
-To run what was generated, we will use `xtsc-run`.
-
-A few environment variables should be set:
-
-	export XTENSA_SYSTEM="${BR2_PACKAGE_XRP_FIRMWARE_XTENSA_SYSTEM}"
-	export XTENSA_CORE="visionp6_ao"
-	export XTENSA_TOOLS="${XTENSA_SYSTEM}/.."
-	export PATH="${XTENSA_TOOLS}/bin:${PATH}"
+To run what was generated, we use `xtsc-run`.
 
 We create the files needed by `xtsc-run`:
 
-	mkdir ../subsystem_visionp6_ao
-	cd ../subsystem_visionp6_ao
+	mkdir subsystem
+	cd subsystem
 	cp ../buildroot/board/xtsc/vp6-mp/subsys.yml .
-	${XTENSA_TOOLS}/libexec/xt-sysbuilder -subsys subsys.yml -swtools ${XTENSA_TOOLS} -build sysbuild
+	${XTENSA_SYSTEM}/../libexec/xt-sysbuilder -subsys subsys.yml -swtools ${XTENSA_SYSTEM}/../ -build sysbuild
 	ln -snf ../buildroot-build/images/rootfs.ext2 rootfs.ext2
 
 We can now use `xtsc-run` to boot Linux:
