@@ -62,7 +62,7 @@
 		#size-cells = <1>;
 		ranges;
 
-		xrp_reserved: xrp@08000000 {
+		xrp_reserved: xrp@8000000 {
 			compatible = "shared-dma-pool";
 			reg = <0x08000000 0x08000000>;
 			reusable;

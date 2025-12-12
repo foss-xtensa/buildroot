@@ -1,0 +1,55 @@
+From c0f8af0e28c9cc728ddbd12bbc551a437519e4d4 Mon Sep 17 00:00:00 2001
+From: William Tambe <williamt@cadence.com>
+Date: Thu, 11 Dec 2025 18:57:44 -0800
+Subject: [PATCH 1/3] xrp-kernel: update to driver to build with v6.12
+
+Signed-off-by: William Tambe <williamt@cadence.com>
+---
+ xrp-kernel/xrp_hw_simple.c | 4 ++--
+ xrp-kernel/xvp_main.c      | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/xrp-kernel/xrp_hw_simple.c b/xrp-kernel/xrp_hw_simple.c
+index 486b0d3..d4852aa 100644
+--- a/xrp-kernel/xrp_hw_simple.c
++++ b/xrp-kernel/xrp_hw_simple.c
+@@ -451,9 +451,9 @@ static int xrp_hw_simple_probe(struct platform_device *pdev)
+ 
+ }
+ 
+-static int xrp_hw_simple_remove(struct platform_device *pdev)
++static void xrp_hw_simple_remove(struct platform_device *pdev)
+ {
+-	return xrp_deinit(pdev);
++	xrp_deinit(pdev);
+ }
+ 
+ static int xrp_hw_simple_idle(struct device *dev)
+diff --git a/xrp-kernel/xvp_main.c b/xrp-kernel/xvp_main.c
+index 216d954..31646fc 100644
+--- a/xrp-kernel/xvp_main.c
++++ b/xrp-kernel/xvp_main.c
+@@ -2163,7 +2163,7 @@ static int xrp_boot_firmware(struct xvp *xvp)
+ 
+ static const struct file_operations xvp_fops = {
+ 	.owner  = THIS_MODULE,
+-	.llseek = no_llseek,
++	.llseek = noop_llseek,
+ 	.unlocked_ioctl = xvp_ioctl,
+ #ifdef CONFIG_COMPAT
+ 	.compat_ioctl = xvp_ioctl,
+@@ -2650,9 +2650,9 @@ static int xrp_probe(struct platform_device *pdev)
+ 	return ret;
+ }
+ 
+-static int xrp_remove(struct platform_device *pdev)
++static void xrp_remove(struct platform_device *pdev)
+ {
+-	return xrp_deinit(pdev);
++	xrp_deinit(pdev);
+ }
+ 
+ static const struct dev_pm_ops xrp_pm_ops = {
+-- 
+2.43.0
+

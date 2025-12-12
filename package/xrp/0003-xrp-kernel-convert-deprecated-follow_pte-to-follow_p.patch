@@ -1,0 +1,71 @@
+From fdc54c09992cb8337a314aebb7a6b412de4e06b9 Mon Sep 17 00:00:00 2001
+From: William Tambe <williamt@cadence.com>
+Date: Thu, 11 Dec 2025 19:39:19 -0800
+Subject: [PATCH 3/3] xrp-kernel: convert deprecated follow_pte() to
+ follow_pfnmap API
+
+follow_pte() was removed by:
+b0a1c0d0edcd mm: remove follow_pte()
+
+Used following commit as guide:
+e6bc784c24fd acrn: use the new follow_pfnmap API
+
+Signed-off-by: William Tambe <williamt@cadence.com>
+---
+ xrp-kernel/xvp_main.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/xrp-kernel/xvp_main.c b/xrp-kernel/xvp_main.c
+index 667c353..ed08db4 100644
+--- a/xrp-kernel/xvp_main.c
++++ b/xrp-kernel/xvp_main.c
+@@ -839,17 +839,18 @@ static long xvp_pfn_virt_to_phys(struct xvp_file *xvp_file,
+ 	unsigned long nr_pages = PFN_UP(vaddr + size) - PFN_DOWN(vaddr);
+ 	unsigned long pfn;
+ 	const struct xrp_address_map_entry *address_map;
+-	spinlock_t *ptl;
+-	pte_t *ptep;
++	struct follow_pfnmap_args args;
+ 
+-	ret = follow_pte(vma, vaddr, &ptep, &ptl);
++	args.vma = vma;
++	args.address = vaddr;
++	ret = follow_pfnmap_start(&args);
+ 	if (ret) {
+ 		pr_debug("%s: failed to lookup PFN at VMA:%pK\n",
+ 			__func__, (void *)vaddr);
+ 		return ret;
+ 	}
+-	pfn = pte_pfn(ptep_get(ptep));
+-	pte_unmap_unlock(ptep, ptl);
++	pfn = args.pfn;
++	follow_pfnmap_end(&args);
+ 
+ 	*paddr = __pfn_to_phys(pfn) + (vaddr & ~PAGE_MASK);
+ 	address_map = xrp_get_address_mapping(&xvp_file->xvp->address_map,
+@@ -862,17 +863,17 @@ static long xvp_pfn_virt_to_phys(struct xvp_file *xvp_file,
+ 	for (i = 1; i < nr_pages; ++i) {
+ 		unsigned long next_pfn;
+ 		phys_addr_t next_phys;
+-		spinlock_t *ptl;
+-		pte_t *ptep;
+ 
+-		ret = follow_pte(vma, vaddr + (i << PAGE_SHIFT), &ptep, &ptl);
++		args.vma = vma;
++		args.address = vaddr + (i << PAGE_SHIFT);
++		ret = follow_pfnmap_start(&args);
+ 		if (ret) {
+ 			pr_debug("%s: failed to lookup PFN at VMA:%pK\n", __func__,
+ 				(void *)vaddr + (i << PAGE_SHIFT));
+ 			return ret;
+ 		}
+-		next_pfn = pte_pfn(ptep_get(ptep));
+-		pte_unmap_unlock(ptep, ptl);
++		next_pfn = args.pfn;
++		follow_pfnmap_end(&args);
+ 		if (next_pfn != pfn + 1) {
+ 			pr_debug("%s: non-contiguous physical memory\n",
+ 				 __func__);
+-- 
+2.43.0
+
