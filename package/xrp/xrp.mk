@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-XRP_VERSION = 189808909f625f2c7b724cb9dabe0e95d606ce6d
+XRP_VERSION = 081f0010e5002d590a11473710e4872e9443df43
 XRP_SITE = $(call github,foss-xtensa,xrp,$(XRP_VERSION))
 XRP_SOURCE = xrp-$(XRP_VERSION).tar.gz
 XRP_LICENSE = MIT, GPL
