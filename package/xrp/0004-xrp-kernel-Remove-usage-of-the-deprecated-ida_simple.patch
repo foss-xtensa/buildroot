@@ -1,0 +1,44 @@
+From 629f102aa45553e74e554318c7bf14f40db670df Mon Sep 17 00:00:00 2001
+From: William Tambe <williamt@cadence.com>
+Date: Thu, 15 Jan 2026 08:23:11 -0800
+Subject: [PATCH] xrp-kernel: Remove usage of the deprecated ida_simple_xx()
+ API
+
+---
+ xrp-kernel/xvp_main.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/xrp-kernel/xvp_main.c b/xrp-kernel/xvp_main.c
+index ed08db4..7ea581c 100644
+--- a/xrp-kernel/xvp_main.c
++++ b/xrp-kernel/xvp_main.c
+@@ -2424,7 +2424,7 @@ static long xrp_init_common(struct platform_device *pdev,
+ 			goto err_pm_disable;
+ 	}
+ 
+-	nodeid = ida_simple_get(&xvp_nodeid, 0, 0, GFP_KERNEL);
++	nodeid = ida_alloc(&xvp_nodeid, GFP_KERNEL);
+ 	if (nodeid < 0) {
+ 		ret = nodeid;
+ 		goto err_pm_disable;
+@@ -2444,7 +2444,7 @@ static long xrp_init_common(struct platform_device *pdev,
+ 		goto err_free_id;
+ 	return PTR_ERR(xvp);
+ err_free_id:
+-	ida_simple_remove(&xvp_nodeid, nodeid);
++	ida_free(&xvp_nodeid, nodeid);
+ err_pm_disable:
+ 	pm_runtime_disable(xvp->dev);
+ err_free_map:
+@@ -2508,7 +2508,7 @@ int xrp_deinit(struct platform_device *pdev)
+ 		dma_free_attrs(xvp->dev, PAGE_SIZE, xvp->comm,
+ 			       phys_to_dma(xvp->dev, xvp->comm_phys), 0);
+ 	xrp_free_address_map(&xvp->address_map);
+-	ida_simple_remove(&xvp_nodeid, xvp->nodeid);
++	ida_free(&xvp_nodeid, xvp->nodeid);
+ 	return 0;
+ }
+ EXPORT_SYMBOL(xrp_deinit);
+-- 
+2.43.0
+
