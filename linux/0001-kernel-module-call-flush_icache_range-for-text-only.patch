@@ -1,0 +1,35 @@
+From 0db86022fadd7923d6f1db77c30842922fee7df9 Mon Sep 17 00:00:00 2001
+From: William Tambe <williamt@cadence.com>
+Date: Tue, 20 Jan 2026 12:12:47 -0800
+Subject: [PATCH] kernel/module: call flush_icache_range() for text only
+
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ kernel/module/main.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/kernel/module/main.c b/kernel/module/main.c
+index 93a07387a..d69c0c51d 100644
+--- a/kernel/module/main.c
++++ b/kernel/module/main.c
+@@ -2325,11 +2325,13 @@ static void flush_module_icache(const struct module *mod)
+ 	 * can provide parameter accessor functions of its own.
+ 	 */
+ 	for_each_mod_mem_type(type) {
+-		const struct module_memory *mod_mem = &mod->mem[type];
++		if (mod_mem_type_is_text(type)) {
++			const struct module_memory *mod_mem = &mod->mem[type];
+ 
+-		if (mod_mem->size) {
+-			flush_icache_range((unsigned long)mod_mem->base,
+-					   (unsigned long)mod_mem->base + mod_mem->size);
++			if (mod_mem->size) {
++				flush_icache_range((unsigned long)mod_mem->base,
++						   (unsigned long)mod_mem->base + mod_mem->size);
++			}
+ 		}
+ 	}
+ }
+-- 
+2.43.0
+
